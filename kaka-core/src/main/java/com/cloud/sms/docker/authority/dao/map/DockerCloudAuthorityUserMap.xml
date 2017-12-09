@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.authority.dao.DockerCloudAuthorityUserDao">
+     <sql id="baseSql">
+        select 
+            user_id as userId,
+            user_name as userName,
+            user_pic as userPic,
+            third_id as thirdId,
+            third_true_name as thirdTrueName,
+            user_email as userEmail,
+            user_mobile as userMobile,
+            is_valid as isValid,
+            is_del as isDel
+         from docker_cloud_authority_user  WHERE 1=1
+     </sql>
+
+    <select id="selectUsername" resultType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+        SELECT             user_name as userName from docker_cloud_authority_user WHERE
+        user_id in
+        <foreach collection="users" close=")" open="(" index="index" item="item" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+         <include refid="baseSql" />
+        <if test="userName != null">
+            and user_name=#{userName}
+        </if>
+     </select>
+
+    <select id="selectLoginUser" resultType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+            select
+            user_id as userId,
+            user_name as userName    from docker_cloud_authority_user
+            WHERE 1=1
+            <if test="key != null">
+                and user_name like concat("%",#{key},"%")
+            </if>
+        <if test="ids != null">
+           and user_id in
+            <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findById" resultType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+                   <include refid="baseSql" />
+            where user_id=#{userId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+        insert into docker_cloud_authority_user(
+            user_id,
+            user_name,
+            user_pic,
+            third_id,
+            third_true_name,
+            user_email,
+            user_mobile,
+            is_valid,
+            is_del
+        ) 
+        values(        
+            #{userId},
+            #{userName},
+            #{userPic},
+            #{thirdId},
+            #{thirdTrueName},
+            #{userEmail},
+            #{userMobile},
+            #{isValid},
+            #{isDel}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+        update docker_cloud_authority_user set   
+            user_id=#{userId},
+            user_name=#{userName},
+            user_pic=#{userPic},
+            third_id=#{thirdId},
+            third_true_name=#{thirdTrueName},
+            user_email=#{userEmail},
+            user_mobile=#{userMobile},
+            is_valid=#{isValid},
+            is_del=#{isDel}
+         where user_id=#{userId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.authority.entity.DockerCloudAuthorityUserEntity">
+        delete from docker_cloud_authority_user where user_id=#{userId}
+    </delete>
+
+</mapper>
+

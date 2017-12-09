@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.network.dao.DockerCloudNetworkDao">
+     <sql id="baseSql">
+        select 
+            network_id as networkId,
+            name as name,
+            subnet_id as subnetId,
+            a.network_ip as networkIp,
+            a.container_Number as containerNumber,
+            a.create_user as createUser,
+            a.last_modify_user as lastModifyUser,
+            a.last_modify_time as lastModifyTime,
+            a.description as description,
+            a.create_time as createTime,
+            a.groups_id as groupsId,
+            b.groups_name as groupsName,
+            c.ent_id as entId
+         from docker_cloud_network a, docker_cloud_groups b, docker_cloud_ent c where a.groups_id=b.groups_id and c.ent_id=b.entname
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+         <include refid="baseSql" />
+        <if test="groupsId != null">
+            and a.groups_id = #{groupsId}
+        </if>
+        <if test="name != null">
+            and a.name = #{name}
+        </if>
+        <if test="entId != null">
+            and c.ent_id=#{entId}
+        </if>
+     </select>
+
+    <select id="selectEntNetwork" resultType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+    select name  from docker_cloud_network a , docker_cloud_groups b , docker_cloud_ent c
+    where b.entname=c.ent_id and a.groups_id= b.groups_id and c.ent_id=#{entId}
+    </select>
+
+    <select id="findById" resultType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+                   <include refid="baseSql" />
+            and network_id=#{networkId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+        insert into docker_cloud_network(
+            network_id,
+            name,
+            subnet_id,
+            network_ip,
+            container_Number,
+            create_user,
+            last_modify_user,
+            last_modify_time,
+            description,
+            create_time,
+            groups_id
+        ) 
+        values(        
+            #{networkId},
+            #{name},
+            #{subnetId},
+            #{networkIp},
+            #{containerNumber},
+            #{createUser},
+            #{lastModifyUser},
+            #{lastModifyTime},
+            #{description},
+            #{createTime},
+            #{groupsId}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+        update docker_cloud_network set   
+            network_id=#{networkId},
+            name=#{name},
+            subnet_id=#{subnetId},
+            network_ip=#{networkIp},
+            container_Number=#{containerNumber},
+
+            last_modify_user=#{lastModifyUser},
+            last_modify_time=#{lastModifyTime},
+            description=#{description},
+            <if test="createTime != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+            </if>
+
+            groups_id=#{groupsId}
+         where network_id=#{networkId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.network.entity.DockerCloudNetworkEntity">
+        delete from docker_cloud_network where network_id=#{networkId}
+    </delete>
+
+</mapper>
+

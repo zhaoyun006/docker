@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudEnvFlowDao">
+     <sql id="baseSql">
+        select 
+            flow_id as flowId,
+            a.env_id as envId,
+            b.service_name as serviceName,
+            b.domain,
+            release_order as releaseOrder,
+            a.create_user as createUser,
+            a.last_modify_user as lastModifyUser,
+            a.create_time as createTime,
+            a.last_modify_time as lastModifyTime,
+            a.description as description
+         from docker_cloud_env_flow a, docker_cloud_ci_env b where a.env_id=b.env_id
+     </sql>
+
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+         <include refid="baseSql" />
+        <if test="envId != null">
+            and a.env_id=#{envId}
+        </if>
+        <if test="envId == null">
+        or a.env_id=0
+        </if>
+     </select>
+
+
+
+    <select id="selectExistsEnv" resultType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+        select flow_id as flowId from docker_cloud_env_flow where env_id=#{envId}
+    </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+                   <include refid="baseSql" />
+          <if test="flow != null">
+              and  flow_id=#{flowId}
+          </if>
+          <if test="flow == null">
+              and flow_id = #{flowId} or a.env_id=0 limit 1
+          </if>
+      </select>
+
+    <select id="findByIdList" resultType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+        <include refid="baseSql" />
+        <if test="flow != null">
+            and  flow_id=#{flowId}
+        </if>
+        <if test="flow == null">
+            and flow_id = #{flowId} or a.env_id=0 limit 1
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+        insert into docker_cloud_env_flow(
+            flow_id,
+            env_id,
+            release_order,
+            create_user,
+            last_modify_user,
+            create_time,
+            last_modify_time,
+            description
+        ) 
+        values(        
+            #{flowId},
+            #{envId},
+            #{releaseOrder},
+            #{createUser},
+            #{lastModifyUser},
+            #{createTime},
+            #{lastModifyTime},
+            #{description}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+        update docker_cloud_env_flow set   
+            flow_id=#{flowId},
+            env_id=#{envId},
+            release_order=#{releaseOrder},
+            last_modify_user=#{lastModifyUser},
+            <if test="createUser != null">
+                create_user=#{createUser},
+                create_time=#{createTime},
+            </if>
+
+            last_modify_time=#{lastModifyTime},
+            description=#{description}
+         where flow_id=#{flowId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudEnvFlowEntity">
+        delete from docker_cloud_env_flow where flow_id=#{flowId}
+    </delete>
+
+</mapper>
+

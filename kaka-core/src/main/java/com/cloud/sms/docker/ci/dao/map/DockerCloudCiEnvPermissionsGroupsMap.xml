@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudCiEnvPermissionsGroupsDao">
+     <sql id="baseSql">
+        select 
+            groups_id as groupsId,
+            groups_name as groupsName,
+            username as username,
+            create_time as createTime,
+            create_user as createUser,
+            last_modify_user as lastModifyUser,
+            last_modify_time as lastModifyTime,
+            description as description
+         from docker_cloud_ci_env_permissions_groups 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="createUser != null">
+            and create_user =#{createUser}
+        </if>
+     </select>
+
+
+    <select id="selectUserGroups" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+  select
+        groups_id as groupsId from docker_cloud_ci_env_permissions_groups
+        WHERE username LIKE  concat("%,",#{username},",%")
+        or username LIKE  concat(#{username},",%")
+        or username=#{usernmae}
+        or username LIKE  concat("%,",#{username})
+    </select>
+
+    <select id="selectGroupsName" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+        select
+        groups_id as groupsId,
+        groups_name as groupsName from docker_cloud_ci_env_permissions_groups
+        WHERE 1=1
+        <if test="createUser != null">
+            and create_user =#{createUser}
+        </if>
+        <if test="ids != null">
+            and groups_id in
+            <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+                   <include refid="baseSql" />
+            where groups_id=#{groupsId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+        insert into docker_cloud_ci_env_permissions_groups(
+            groups_id,
+            groups_name,
+            username,
+            create_time,
+            create_user,
+            last_modify_user,
+            last_modify_time,
+            description
+        ) 
+        values(        
+            #{groupsId},
+            #{groupsName},
+            #{username},
+            #{createTime},
+            #{createUser},
+            #{lastModifyUser},
+            #{lastModifyTime},
+            #{description}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+        update docker_cloud_ci_env_permissions_groups set   
+            groups_id=#{groupsId},
+            groups_name=#{groupsName},
+            username=#{username},
+            <if test="createUser != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+            </if>
+            last_modify_user=#{lastModifyUser},
+            last_modify_time=#{lastModifyTime},
+            description=#{description}
+         where groups_id=#{groupsId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvPermissionsGroupsEntity">
+        delete from docker_cloud_ci_env_permissions_groups where groups_id=#{groupsId}
+    </delete>
+
+</mapper>
+

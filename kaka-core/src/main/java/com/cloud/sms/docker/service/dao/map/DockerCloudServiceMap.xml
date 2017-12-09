@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.service.dao.DockerCloudServiceDao">
+    <sql id="baseSql">
+        select 
+            service_id as serviceId,
+            a.service_name as serviceName,
+            a.app_name as appName,
+            a.create_time as createTime,
+            a.create_user as createUser,
+            a.memory as memory,
+            a.cpu as cpu,
+            privileged as privileged,
+            cmd as cmd,
+            image as image,
+            container_number as containerNumber,
+            a.gson_data as gsonData,
+            service_tp as serviceTp,
+            scale_on as scaleOn,
+            scale_min as scaleMin,
+            scale_max as scaleMax,
+            scale_mem as scaleMem,
+            scale_cpu as scaleCpu,
+            b.ent_id as entId,
+            a.groups_id as groupsId,
+            c.groups_name as groupsName,
+            b.entname as entname
+         from docker_cloud_service a, docker_cloud_ent b, docker_cloud_groups c WHERE
+         a.groups_id=c.groups_id and c.entname = b.ent_id
+     </sql>
+
+    <select id="selectRollback" resultType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+        select gson_data as gsonData from docker_cloud_service_rollback where service_name=#{serviceName}
+        and create_user=#{createUser}
+    </select>
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+         <include refid="baseSql" />
+        <if test="appName">
+            and a.app_name = #{appName}
+        </if>
+        <if test="serviceName != null">
+            and a.service_name=#{serviceName}
+        </if>
+        <if test="list != null">
+            and a.gson_data != "" and gson_data  is not null
+        </if>
+        <if test="entId != null">
+            and a.ent_id = #{entId}
+        </if>
+        <if test="entname != null">
+            and b.entname=#{entname}
+        </if>
+     </select>
+
+    <select id="findById" resultType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+                   <include refid="baseSql" />
+            and a.service_id=#{serviceId}
+      </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+            insert into ${tableName} (
+            service_id,
+            service_name,
+            app_name,
+            create_time,
+            create_user,
+            memory,
+            cpu,
+            privileged,
+            cmd,
+            image,
+            container_number,
+            gson_data,
+            service_tp,
+            scale_on,
+            scale_min,
+            scale_max,
+            scale_mem,
+            scale_cpu,
+            ent_id,
+            groups_id,
+            groups_name,
+            entname
+            )
+            values(
+            #{serviceId},
+            #{serviceName},
+            #{appName},
+            #{createTime},
+            #{createUser},
+            #{memory},
+            #{cpu},
+            #{privileged},
+            #{cmd},
+            #{image},
+            #{containerNumber},
+            #{gsonData},
+            #{serviceTp},
+            #{scaleOn},
+            #{scaleMin},
+            #{scaleMax},
+            #{scaleMem},
+            #{scaleCpu},
+            #{entId},
+            #{groupsId},
+            #{groupsName},
+            #{entname}
+            )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+        update ${tableName} set
+            service_name=#{serviceName},
+            app_name=#{appName},
+            create_time=#{createTime},
+            create_user=#{createUser},
+            memory=#{memory},
+            cpu=#{cpu},
+            privileged=#{privileged},
+            cmd=#{cmd},
+            image=#{image},
+            container_number=#{containerNumber},
+            gson_data=#{gsonData},
+            service_tp=#{serviceTp},
+            scale_on=#{scaleOn},
+            scale_min=#{scaleMin},
+            scale_max=#{scaleMax},
+            scale_mem=#{scaleMem},
+               ent_id=#{entId},
+            groups_id=#{groupsId},
+            groups_name=#{groupsName},
+            entname=#{entname},
+            scale_cpu=#{scaleCpu}
+         where service_name=#{serviceName} and ent_id=#{entId}
+    </update>
+
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.service.entity.DockerCloudServiceEntity">
+        delete from ${tableName} where service_name=#{serviceName}
+        <if test="createUser != null">
+            and create_user=#{createUser}
+        </if>
+        <if test="entId != null">
+            and ent_id=#{entId}
+        </if>
+
+    </delete>
+
+</mapper>
+

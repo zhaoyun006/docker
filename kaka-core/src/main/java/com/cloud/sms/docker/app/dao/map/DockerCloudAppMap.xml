@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.app.dao.DockerCloudAppDao">
+     <sql id="baseSql">
+        select 
+            app_id as appId,
+            app_name as appName,
+            app_description as appDescription,
+            compose as compose,
+            local_path as localPath,
+            upload_file as uploadFile,
+            create_user as createUser,
+            create_time as createTime,
+            is_del as isDel,
+            status as status,
+            image as image,
+            container_number as containerNumber,
+            app_tp as appTp
+         from docker_cloud_app 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.app.entity.DockerCloudAppEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="appName">
+            and app_name = #{appName}
+        </if>
+     </select>
+      <select id="findById" resultType="com.cloud.sms.docker.app.entity.DockerCloudAppEntity">
+                   <include refid="baseSql" />
+            where app_id=#{appId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.app.entity.DockerCloudAppEntity">
+        insert into docker_cloud_app(
+            app_id,
+            app_name,
+            app_description,
+            compose,
+            local_path,
+            upload_file,
+            create_user,
+            create_time,
+            is_del,
+            status,
+            image,
+            container_number,
+            app_tp
+        ) 
+        values(        
+            #{appId},
+            #{appName},
+            #{appDescription},
+            #{compose},
+            #{localPath},
+            #{uploadFile},
+            #{createUser},
+            #{createTime},
+            #{isDel},
+            #{status},
+            #{image},
+            #{containerNumber},
+            #{appTp}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.app.entity.DockerCloudAppEntity">
+        update docker_cloud_app set   
+            app_id=#{appId},
+            app_name=#{appName},
+            app_description=#{appDescription},
+            compose=#{compose},
+            local_path=#{localPath},
+            upload_file=#{uploadFile},
+            create_user=#{createUser},
+            create_time=#{createTime},
+            is_del=#{isDel},
+            status=#{status},
+            image=#{image},
+            container_number=#{containerNumber},
+            app_tp=#{appTp}
+         where app_id=#{appId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.app.entity.DockerCloudAppEntity">
+        delete from docker_cloud_app where app_id=#{appId}
+    </delete>
+
+</mapper>
+

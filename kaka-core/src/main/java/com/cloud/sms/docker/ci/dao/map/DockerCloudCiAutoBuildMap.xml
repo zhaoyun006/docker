@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudCiAutoBuildDao">
+     <sql id="baseSql">
+        select 
+            build_id as buildId,
+            env_id as envId,
+            update_build as updateBuild,
+            build_time as buildTime,
+            create_time as createTime,
+            build_param as buildParam,
+            crete_user as creteUser
+         from docker_cloud_ci_auto_build 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="envId != null">
+            and env_id=#{envId}
+        </if>
+     </select>
+
+    <select id="selectBuildParam" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+             select
+            build_param as buildParam
+         from docker_cloud_ci_auto_build
+    </select>
+
+
+    <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+                   <include refid="baseSql" />
+            where build_id=#{buildId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+        insert into docker_cloud_ci_auto_build(
+            env_id,
+            update_build,
+            build_time,
+            create_time,
+            build_param,
+            crete_user
+        ) 
+        values(
+            #{envId},
+            #{updateBuild},
+            #{buildTime},
+            #{createTime},
+            #{buildParam},
+            #{creteUser}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+        update docker_cloud_ci_auto_build set   
+
+            env_id=#{envId},
+            update_build=#{updateBuild},
+            build_time=#{buildTime},
+            create_time=#{createTime},
+            build_param=#{buildParam},
+            crete_user=#{creteUser}
+         where env_id=#{envId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiAutoBuildEntity">
+        delete from docker_cloud_ci_auto_build where env_id=#{envId}
+    </delete>
+
+</mapper>
+

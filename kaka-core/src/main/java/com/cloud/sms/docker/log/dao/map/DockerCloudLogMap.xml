@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.log.dao.DockerCloudLogDao">
+     <sql id="baseSql">
+        select 
+            log_id as logId,
+            time as time,
+            messages as messages,
+            user_name as userName,
+            app_name as appName,
+            container_name as containerName,
+            service_name as serviceName,
+            network_name as networkName
+         from docker_cloud_log  WHERE 1=1
+         <if test="appName">
+             and app_name = #{appName}
+         </if>
+         <if test="serviceName != null">
+             and service_name=#{serviceName}
+         </if>
+         <if test="containerName != null">
+             and container_name= #{containerName}
+         </if>
+         <if test="networkName != null">
+             and network_name = #{networkName}
+         </if>
+     </sql>
+
+    <select id="selectCounter" resultType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+        select log_id from docker_cloud_log
+    </select>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+         <include refid="baseSql" />
+        ORDER  by log_id desc
+     </select>
+
+    <select id="last10" resultType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+        <include refid="baseSql" />
+        ORDER  by log_id desc limit 10
+    </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+                   <include refid="baseSql" />
+            where log_id=#{logId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+        insert into docker_cloud_log(
+            log_id,
+            time,
+            messages,
+            user_name,
+            app_name,
+            container_name,
+            service_name,
+            network_name
+        ) 
+        values(        
+            #{logId},
+            #{time},
+            #{messages},
+            #{userName},
+            #{appName},
+            #{containerName},
+            #{serviceName},
+            #{networkName}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+        update docker_cloud_log set   
+            log_id=#{logId},
+            time=#{time},
+            messages=#{messages},
+            user_name=#{userName},
+            app_name=#{appName},
+            container_name=#{containerName},
+            service_name=#{serviceName},
+            network_name=#{networkName}
+         where log_id=#{logId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.log.entity.DockerCloudLogEntity">
+        delete from docker_cloud_log where log_id=#{logId}
+    </delete>
+
+</mapper>
+

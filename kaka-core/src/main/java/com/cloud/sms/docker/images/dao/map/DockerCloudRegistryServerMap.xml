@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.images.dao.DockerCloudRegistryServerDao">
+     <sql id="baseSql">
+        select 
+            server_id as serverId,
+            server_address as serverAddress,
+            server_domain as serverDomain,
+            a.last_modify_time as lastModifyTime,
+            a.last_modify_user as lastModifyUser,
+            a.create_time as createTime,
+            a.create_user as createUser,
+            b.groups_name as groups,
+            a.username ,
+            a.prefix,
+            images_number as imagesNumber,
+            a.groups_id as groupsId,
+            a.description as description
+         from docker_cloud_registry_server a, docker_cloud_groups b WHERE a.groups_id=b.groups_id
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.images.entity.DockerCloudRegistryServerEntity">
+         <include refid="baseSql" />
+        <if test="groups != null">
+            and b.groups_name=#{groups}
+        </if>
+        <if test="key != null">
+            and (server_address like concat("%",#{key},"%") or description like concat("%",#{key},"%")  )
+        </if>
+     </select>
+      <select id="findById" resultType="com.cloud.sms.docker.images.entity.DockerCloudRegistryServerEntity">
+                   <include refid="baseSql" />
+            and server_id=#{serverId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.images.entity.DockerCloudRegistryServerEntity">
+        insert into docker_cloud_registry_server(
+            server_id,
+            server_address,
+            server_domain,
+            last_modify_time,
+            last_modify_user,
+            create_time,
+            create_user,
+            groups,
+            images_number,
+            groups_id,
+            description,
+            username ,
+            password,
+            prefix
+        ) 
+        values(        
+            #{serverId},
+            #{serverAddress},
+            #{serverDomain},
+            #{lastModifyTime},
+            #{lastModifyUser},
+            #{createTime},
+            #{createUser},
+            #{groups},
+            #{imagesNumber},
+            #{groupsId},
+            #{description},
+            #{username} ,
+            #{password},
+            #{prefix}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.images.entity.DockerCloudRegistryServerEntity">
+        update docker_cloud_registry_server set   
+            server_id=#{serverId},
+            server_address=#{serverAddress},
+            server_domain=#{serverDomain},
+            last_modify_time=#{lastModifyTime},
+            last_modify_user=#{lastModifyUser},
+            <if test="createTime != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+                images_number=#{imagesNumber},
+            </if>
+        username = #{username} ,
+        password = #{password},
+        prefix = #{prefix},
+            groups_id=#{groupsId},
+            groups=#{groups},
+            description=#{description}
+         where server_id=#{serverId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.images.entity.DockerCloudRegistryServerEntity">
+        delete from docker_cloud_registry_server where server_id=#{serverId}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudReleaseRecordDao">
+     <sql id="baseSql">
+        select 
+            record_id as recordId,
+            a.env_id as envId,
+            a.create_time as createTime,
+            a.create_user as createUser,
+            current_version as currentVersion,
+            last_version as lastVersion,
+            a.status as status,
+            b.service_name as serviceName,
+            a.domain as domain,
+            a.registry_address as registryAddress,
+            a.ent_id as entId,
+            registry,
+            c.entname as entName
+         from docker_cloud_release_record  a, docker_cloud_ci_env b, docker_cloud_ent c
+         WHERE a.ent_id = c.ent_id and a.env_id = b.env_id
+     </sql>
+
+    <select id="selectLastVersion" resultType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+              select
+            current_version as currentVersion
+         from docker_cloud_release_record WHERE current_version=#{version}
+         and ent_id=#{entId}
+         and env_id = #{envId}
+    </select>
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+         <include refid="baseSql" />
+        <if test="envId != null">
+            and a.env_id=#{envId}
+        </if>
+        <if test="entId != null">
+            and a.ent_id=#{entId}
+        </if>
+        <if test="serviceName != null">
+            and b.service_name=#{serviceName}
+        </if>
+        order by record_id desc
+     </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+                   <include refid="baseSql" />
+            where record_id=#{recordId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+        insert into docker_cloud_release_record(
+            record_id,
+            env_id,
+            create_time,
+            create_user,
+            current_version,
+            last_version,
+            status,
+            service_name,
+            domain,
+            registry_address,
+            ent_id,
+            registry
+        ) 
+        values(        
+            #{recordId},
+            #{envId},
+            #{createTime},
+            #{createUser},
+            #{currentVersion},
+            #{lastVersion},
+            #{status},
+            #{serviceName},
+            #{domain},
+            #{registryAddress},
+            #{entId},
+            #{registry}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+        update docker_cloud_release_record set   
+            record_id=#{recordId},
+            env_id=#{envId},
+            create_time=#{createTime},
+            create_user=#{createUser},
+            current_version=#{currentVersion},
+            last_version=#{lastVersion},
+            status=#{status},
+            service_name=#{serviceName},
+            domain=#{domain},
+            registry=#{registry},
+            registry_address=#{registryAddress},
+            ent_id=#{entId}
+         where record_id=#{recordId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudReleaseRecordEntity">
+        delete from docker_cloud_release_record where record_id=#{recordId}
+    </delete>
+
+</mapper>
+

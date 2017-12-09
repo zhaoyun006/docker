@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudImagesBuildLogDao">
+     <sql id="baseSql">
+        select 
+            log_id as logId,
+            create_time as createTime,
+            create_user as createUser,
+            messages as messages,
+            env_id as envId,
+            build_status as buildStatus,
+            build_server_api as buildServerApi,
+            build_param as buildParam,
+            build_tp as buildTp,
+            tag as tag
+         from docker_cloud_images_build_log 
+     </sql>
+
+    <select id="selectServerApi" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        <include refid="baseSql" />  where env_id=#{envId}  and create_user=#{createUser} order by log_id desc limit 1
+    </select>
+
+
+    <select id="selectUpdateParam" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        <include refid="baseSql" />  where env_id=#{envId}  and tag=#{tag} order by log_id desc limit 1
+    </select>
+
+    <select id="selectPushImageTag" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+       select tag from docker_cloud_images_build_log where env_id=#{envId} and build_status=1 order by log_id desc limit 10
+    </select>
+
+    <select id="selectImagesTag" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        select           log_id as logId,tag, create_time  as createTime  ,build_status as buildStatus, build_tp as buildTp  from docker_cloud_images_build_log where env_id=#{envId} order by log_id desc
+    </select>
+
+    <select id="selectCounter" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        select log_id from docker_cloud_images_build_log
+    </select>
+
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="logId != null">
+            and log_id=#{logId}
+        </if>
+        <if test="envId != null">
+            and env_id=#{envId}
+        </if>
+        <if test="tag != null">
+            and tag =#{tag}
+        </if>
+     </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+                   <include refid="baseSql" />  where log_id=#{logId}
+      </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        insert into docker_cloud_images_build_log(
+            log_id,
+            create_time,
+            create_user,
+            messages,
+            env_id,
+            build_status,
+            build_server_api,
+            build_param,
+            build_tp,
+            tag
+        ) 
+        values(        
+            #{logId},
+            #{createTime},
+            #{createUser},
+            #{messages},
+            #{envId},
+            #{buildStatus},
+            #{buildServerApi},
+            #{buildParam},
+            #{buildTp},
+            #{tag}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        update docker_cloud_images_build_log set   
+            log_id=#{logId},
+            <if test="createTime != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+            </if>
+            messages=#{messages},
+
+        <if test="buildParam != null">
+            build_status=#{buildStatus},
+            build_server_api=#{buildServerApi},
+            build_param=#{buildParam},
+            tag=#{tag},
+
+        </if>
+        <if test="buildTp != null">
+            build_tp = #{buildTp},
+        </if>
+
+        env_id=#{envId}
+         where log_id=#{logId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagesBuildLogEntity">
+        delete from docker_cloud_images_build_log where log_id=#{logId}
+    </delete>
+
+</mapper>
+

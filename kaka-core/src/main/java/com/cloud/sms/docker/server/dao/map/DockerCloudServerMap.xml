@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.server.dao.DockerCloudServerDao">
+     <sql id="baseSql">
+        select 
+            server_id as serverId,
+            server_address as serverAddress,
+            b.groups_name as groups,
+            a.comm as comm,
+            cpu_number as cpuNumber,
+            mem_size as memSize,
+            instance as instance,
+            status as status,
+            no_runing as noRuning,
+            images as images,
+            paused as paused,
+            docker_version as dockerVersion,
+            mem_limit as memLimit,
+            can_install as canInstall,
+            kernel as kernel,
+            hostname as hostname,
+            cpu_shares as cpuShares,
+            no_running as noRunning,
+            a.last_modify_time as lastModifyTime,
+            a.last_modify_user as lastModifyUser,
+            api_port as apiPort,
+            gson_data as gsonData,
+            a.groups_id as groupsId,
+            c.ent_id as entId,
+            cluter_tp as cluterTp
+         from docker_cloud_server a, docker_cloud_groups b, docker_cloud_ent c  WHERE a.groups_id=b.groups_id and b.entname=c.ent_id
+     </sql>
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+         <include refid="baseSql" />
+        <if test="groups != null">
+            and b.groups_name = #{groups}
+        </if>
+        <if test="key != null">
+            and (server_address like concat("%",#{key},"%") or comm like concat("%",#{key},"%")  )
+        </if>
+        <if test="serverAddress != null">
+            and  server_address =#{serverAddress}
+        </if>
+        <if test="groupsId != null">
+            and   a.groups_id =#{groupsId}
+        </if>
+     </select>
+
+    <!--查询某个组里服务数量-->
+    <select id="selectServiceNumber" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        select groups_id as groupsId from docker_cloud_service WHERE groups_id=#{groupsId}
+    </select>
+
+
+    <select id="selectCompileServer" resultType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+     select c.entname , server_address as serverAddress, api_port as apiPort,
+        b.service_name as serviceName from
+                docker_cloud_server a, docker_cloud_ci_env b,
+                docker_cloud_ent c, docker_cloud_groups d
+                    where c.ent_id=d.entname   and a.groups_id=d.groups_id and b.env_id=#{envId} and d.entname=#{entId};
+    </select>
+
+    <select id="selectIpGroup" resultType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+            select
+            server_address as serverAddress,
+            a.cluter_tp as cluterTp,
+            c.ent_id as entId,
+            b.groups_name as groups   from docker_cloud_server a, docker_cloud_groups b, docker_cloud_ent c WHERE b.entname = c.ent_id and a.groups_id=b.groups_id
+
+    </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+                   <include refid="baseSql" />
+      and server_id=#{serverId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+        insert into docker_cloud_server(
+            server_id,
+            server_address,
+            groups,
+            comm,
+            cpu_number,
+            mem_size,
+            instance,
+            status,
+            no_runing,
+            images,
+            paused,
+            docker_version,
+            mem_limit,
+            can_install,
+            kernel,
+            hostname,
+            cpu_shares,
+            no_running,
+            last_modify_time,
+            last_modify_user,
+            api_port,
+            gson_data,
+            cluter_tp,
+            groups_id
+        ) 
+        values(        
+            #{serverId},
+            #{serverAddress},
+            #{groups},
+            #{comm},
+            #{cpuNumber},
+            #{memSize},
+            #{instance},
+            #{status},
+            #{noRuning},
+            #{images},
+            #{paused},
+            #{dockerVersion},
+            #{memLimit},
+            #{canInstall},
+            #{kernel},
+            #{hostname},
+            #{cpuShares},
+            #{noRunning},
+            #{lastModifyTime},
+            #{lastModifyUser},
+            #{apiPort},
+            #{gsonData},
+            #{cluterTp},
+            #{groupsId}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+        update docker_cloud_server set   
+            server_id=#{serverId},
+            server_address=#{serverAddress},
+            groups=#{groups},
+            comm=#{comm},
+            cpu_number=#{cpuNumber},
+            mem_size=#{memSize},
+            instance=#{instance},
+            status=#{status},
+            no_runing=#{noRuning},
+            images=#{images},
+            paused=#{paused},
+            docker_version=#{dockerVersion},
+            mem_limit=#{memLimit},
+            can_install=#{canInstall},
+            kernel=#{kernel},
+            hostname=#{hostname},
+            cpu_shares=#{cpuShares},
+            no_running=#{noRunning},
+            last_modify_time=#{lastModifyTime},
+            last_modify_user=#{lastModifyUser},
+            api_port=#{apiPort},
+            gson_data=#{gsonData},
+            cluter_tp=#{cluterTp},
+            groups_id=#{groupsId}
+         where server_id=#{serverId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.server.entity.DockerCloudServerEntity">
+        delete from docker_cloud_server where server_id=#{serverId}
+    </delete>
+
+</mapper>
+

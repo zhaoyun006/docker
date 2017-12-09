@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.images.dao.DockerCloudImagesBuildTemplateDao">
+     <sql id="baseSql">
+        select 
+            template_id as templateId,
+            create_time as createTime,
+            create_user as createUser,
+            description as description,
+            property as property,
+            docker_file as dockerFile,
+            image_name as imageName,
+            image_url as imageUrl,
+            last_modify_user as lastModifyUser
+         from docker_cloud_images_build_template 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+         <include refid="baseSql" />
+      WHERE 1=1
+        <if test="user != null">
+            and (create_user=#{user} or property="public")
+        </if>
+     </select>
+
+    <select id="selectCounter" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+        select template_id from docker_cloud_images_build_template
+    </select>
+
+    <select id="selectTemplate" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+        select
+        template_id as templateId,
+        description as description,
+        image_name as imageName,
+        image_url as imageUrl
+        from docker_cloud_images_build_template WHERE 1=1   and (create_user=#{user} or property="public")
+    </select>
+
+
+      <select id="findById" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+                   <include refid="baseSql" />
+            where template_id=#{templateId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+        insert into docker_cloud_images_build_template(
+            template_id,
+            create_time,
+            create_user,
+            description,
+            property,
+            docker_file,
+            image_name,
+            image_url,
+            last_modify_user
+        ) 
+        values(        
+            #{templateId},
+            #{createTime},
+            #{createUser},
+            #{description},
+            #{property},
+            #{dockerFile},
+            #{imageName},
+            #{imageUrl},
+            #{lastModifyUser}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+        update docker_cloud_images_build_template set   
+            template_id=#{templateId},
+            <if test="createTime != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+            </if>
+            description=#{description},
+            property=#{property},
+            docker_file=#{dockerFile},
+            image_name=#{imageName},
+            image_url=#{imageUrl},
+            last_modify_user=#{lastModifyUser}
+         where template_id=#{templateId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesBuildTemplateEntity">
+        delete from docker_cloud_images_build_template where template_id=#{templateId}
+    </delete>
+
+</mapper>
+

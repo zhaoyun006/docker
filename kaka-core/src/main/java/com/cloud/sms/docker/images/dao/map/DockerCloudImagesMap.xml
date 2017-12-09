@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.images.dao.DockerCloudImagesDao">
+     <sql id="baseSql">
+        select 
+            images_id as imagesId,
+            froms as froms,
+            name as name,
+            registry as registry,
+            tag as tag,
+            size as size,
+            create_time as createTime,
+            create_user as createUser,
+            description as description
+         from docker_cloud_images 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesEntity">
+         <include refid="baseSql" />
+     </select>
+      <select id="findById" resultType="com.cloud.sms.docker.images.entity.DockerCloudImagesEntity">
+                   <include refid="baseSql" />
+            where images_id=#{imagesId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesEntity">
+        insert into docker_cloud_images(
+            images_id,
+            froms,
+            name,
+            registry,
+            tag,
+            size,
+            create_time,
+            create_user,
+            description
+        ) 
+        values(        
+            #{imagesId},
+            #{froms},
+            #{name},
+            #{registry},
+            #{tag},
+            #{size},
+            #{createTime},
+            #{createUser},
+            #{description}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesEntity">
+        update docker_cloud_images set   
+            images_id=#{imagesId},
+            froms=#{froms},
+            name=#{name},
+            registry=#{registry},
+            tag=#{tag},
+            size=#{size},
+            create_time=#{createTime},
+            create_user=#{createUser},
+            description=#{description}
+         where images_id=#{imagesId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.images.entity.DockerCloudImagesEntity">
+        delete from docker_cloud_images where images_id=#{imagesId}
+    </delete>
+
+</mapper>
+

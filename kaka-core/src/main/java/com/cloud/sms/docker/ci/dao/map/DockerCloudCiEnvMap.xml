@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudCiEnvDao">
+    <sql id="baseSql">
+        select 
+            env_id as envId,
+            a.create_user as createUser,
+            a.last_modify_user as lastModifyUser,
+            a.create_time as createTime,
+            a.last_modify_time as lastModifyTime,
+            a.description as description,
+            service_name as serviceName,
+            a.entname as entname,
+            container_max_number as containerMaxNumber,
+            dept as dept,
+            build_status as buildStatus,
+            domain as domain,
+            build_script as buildScript,
+            item_tp as itemTp,
+            container_number as containerNumber,
+            health_script as healthScript,
+            a.gson_data as gsonData,
+            a.groups_id as groupsId,
+            auto_compile as autoCompile,
+            auto_compile_tp as autoCompileTp,
+            auto_compile_time as autoCompileTime,
+            auto_compile_status as autoCompileStatus,
+            code_path as codePath,
+            code_branch as codeBranch,
+            images as images,
+            images_tp as imagesTp,
+            cpu as cpu,
+            memory as memory,
+            approve as approve,
+            groups_ids as groupsIds,
+            approve_time as approveTime,
+            approve_user as approveUser
+        from docker_cloud_ci_env a
+    </sql>
+
+    <select id="selectExistsName" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select env_id as envId from docker_cloud_ci_env where   service_name =#{serviceName}
+    </select>
+
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        <include refid="baseSql"/>
+        WHERE 1=1
+        <if test="groups != null">
+            and b.groups_name = #{groups}
+        </if>
+        <if test="key != null">
+            and (service_name like concat("%",#{key},"%")
+            or b.groups_name like concat("%",#{key},"%")
+            or a.health_script like concat("%",#{key},"%")
+            or domain like concat("%",#{key},"%")
+            or code_path like concat("%",#{key},"%")
+            or code_branch like concat("%",#{key},"%")
+            or build_script like concat("%",#{key},"%")
+            or a.description like concat("%",#{key},"%"))
+        </if>
+        <if test="createUser != null">
+            and a.create_user = #{createUser}
+        </if>
+        order by a.env_id desc
+    </select>
+
+    <select id="selectBuildStart" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        <include refid="baseSql"/>
+        WHERE 1=1 and a.build_status = "1"
+    </select>
+
+
+    <select id="selectRegistry" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+ select   b.server_address as serverAddress, c.service_name as serviceName, b.server_domain   as serverDomain
+  from docker_cloud_ci_env c ,
+   docker_cloud_groups a,
+    docker_cloud_registry_server b
+    where a.groups_id=b.groups_id and a.entname=#{entId} and c.env_id=#{envId}
+    </select>
+
+    <select id="selectServiceName" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select env_id as envId, service_name as serviceName from docker_cloud_ci_env WHERE 1=1
+        and (create_user=#{createUser}
+        or env_id in
+        <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+            #{item}
+        </foreach>)
+        <if test="admin != null">
+            or env_id > 0
+        </if>
+    </select>
+
+    <!-- 检查服务名称是否存在 -->
+    <select id="selectServiceExists" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        SELECT service_name as serviceName from docker_cloud_ci_env where service_name=#{serviceName}
+    </select>
+
+
+    <select id="selectUserEnv" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select a.env_id as envId, service_name as serviceName, domain,dept,a.create_time as createTime,
+        a.entname as entname,a.description as description from docker_cloud_ci_env a
+        where
+        (a.create_user=#{createUser}
+        or a.env_id in
+        <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectDept" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select distinct dept from docker_cloud_ci_env
+    </select>
+
+    <select id="selectItemTp" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select distinct item_tp as itemTp from docker_cloud_ci_env
+    </select>
+
+    <select id="selectCounter" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        select env_id from docker_cloud_ci_env
+    </select>
+
+    <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        <include refid="baseSql"/>
+        WHERE 1=1
+        and env_id=#{envId}
+    </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        insert into docker_cloud_ci_env(
+            env_id,
+            create_user,
+            last_modify_user,
+            create_time,
+            last_modify_time,
+            description,
+            service_name,
+            entname,
+            dept,
+            groups_ids,
+            domain,
+            build_script,
+            item_tp,
+            container_number,
+            health_script,
+            gson_data,
+            groups_id,
+            groups_name,
+            auto_compile,
+            auto_compile_tp,
+            auto_compile_time,
+            auto_compile_status,
+            code_path,
+            code_branch,
+            images,
+            images_tp,
+            cpu,
+            memory,
+            approve,
+            approve_time,
+            approve_user,
+            container_max_number
+        ) 
+        values(        
+            #{envId},
+            #{createUser},
+            #{lastModifyUser},
+            #{createTime},
+            #{lastModifyTime},
+            #{description},
+            #{serviceName},
+            #{entname},
+            #{dept},
+            #{groupsIds},
+            #{domain},
+            #{buildScript},
+            #{itemTp},
+            #{containerNumber},
+            #{healthScript},
+            #{gsonData},
+            #{groupsId},
+            #{groupsName},
+            #{autoCompile},
+            #{autoCompileTp},
+            #{autoCompileTime},
+            #{autoCompileStatus},
+            #{codePath},
+            #{codeBranch},
+            #{images},
+            #{imagesTp},
+            #{cpu},
+            #{memory},
+            #{approve},
+            #{approveTime},
+            #{approveUser},
+            #{containerMaxNumber}
+        )
+    </insert>
+
+
+    <!-- 删除更新锁定 -->
+    <update id="deleteLock" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+          update docker_cloud_ci_env set build_status="0" where env_id=#{envId} and build_status=1
+    </update>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        update docker_cloud_ci_env set
+        env_id=#{envId},
+        last_modify_user=#{lastModifyUser},
+        <if test="createUser != null">
+            create_user=#{createUser},
+            create_time=#{createTime},
+        </if>
+        last_modify_time=#{lastModifyTime},
+        description=#{description},
+        entname=#{entname},
+        dept=#{dept},
+        groups_ids=#{groupsIds},
+        <if test="buildStatus != null">
+            build_status=#{buildStatus},
+        </if>
+        build_script=#{buildScript},
+        item_tp=#{itemTp},
+        container_number=#{containerNumber},
+        health_script=#{healthScript},
+        <if test="approve == null">
+            domain=#{domain},
+            gson_data=#{gsonData},
+        </if>
+        groups_id=#{groupsId},
+        groups_name=#{groupsName},
+        auto_compile=#{autoCompile},
+        auto_compile_tp=#{autoCompileTp},
+        auto_compile_time=#{autoCompileTime},
+        auto_compile_status=#{autoCompileStatus},
+        code_path=#{codePath},
+        code_branch=#{codeBranch},
+        images=#{images},
+        domain=#{domain},
+        gson_data=#{gsonData},
+        <if test="approveTime != null">
+            approve=#{approve},
+            approve_time=#{approveTime},
+            approve_user=#{approveUser},
+        </if>
+        images_tp=#{imagesTp}
+        where env_id=#{envId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudCiEnvEntity">
+        delete from docker_cloud_ci_env where service_name=#{serviceName}
+    </delete>
+
+</mapper>
+

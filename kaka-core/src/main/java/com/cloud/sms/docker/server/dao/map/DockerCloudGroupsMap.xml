@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.server.dao.DockerCloudGroupsDao">
+     <sql id="baseSql">
+        select 
+            a.groups_id as groupsId,
+            a.groups_name as groupsName,
+            a.create_user as createUser,
+            a.last_modify_user as lastModifyUser,
+            a.last_modify_time as lastModifyTime,
+            a.description as description,
+            a.create_time as createTime,
+            b.entname as entname,
+            b.ent_id as entId
+         from docker_cloud_groups a, docker_cloud_ent b where
+         a.entname = b.ent_id
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+         <include refid="baseSql" />
+        <if test="key != null">
+            and groups_name like concat("%",#{key},"%")
+        </if>
+        <if test="ids != null">
+            and groups_id in
+            <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entId != null">
+            and a.entname=#{entId}
+        </if>
+     </select>
+
+    <select id="selectEnvGroups" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        select      a.groups_id as groupsId,b.entname,
+            a.groups_name as groupsName  from    docker_cloud_groups a, docker_cloud_ent b where
+         a.entname = b.ent_id group by entname
+    </select>
+
+    <select id="selectGroups" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        select groups_id as groupsId,
+            groups_name as groupsName from docker_cloud_groups
+    </select>
+
+
+    <select id="selectEntName" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        select distinct entname from docker_cloud_groups
+    </select>
+
+    <select id="selectIdleGroups" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+          select a.groups_id as groupsId, groups_name as groupsName, b.entname as entname from docker_cloud_groups a , docker_cloud_ent b  where a.entname=b.ent_id and b.ent_id=#{entId}
+    </select>
+
+      <select id="findById" resultType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+                   <include refid="baseSql" />
+            and a.groups_id=#{groupsId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        insert into docker_cloud_groups(
+            groups_id,
+            groups_name,
+            create_user,
+            last_modify_user,
+            last_modify_time,
+            description,
+            create_time,
+            entname
+        ) 
+        values(        
+            #{groupsId},
+            #{groupsName},
+            #{createUser},
+            #{lastModifyUser},
+            #{lastModifyTime},
+            #{description},
+            #{createTime},
+            #{entname}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        update docker_cloud_groups set   
+            groups_id=#{groupsId},
+            groups_name=#{groupsName},
+
+            last_modify_user=#{lastModifyUser},
+            last_modify_time=#{lastModifyTime},
+            description=#{description},
+            <if test="createTime != null">
+                create_time=#{createTime},
+                create_user=#{createUser},
+            </if>
+            entname=#{entname}
+         where groups_id=#{groupsId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.server.entity.DockerCloudGroupsEntity">
+        delete from docker_cloud_groups where groups_id=#{groupsId}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.log.dao.DockerCloudOperLogDao">
+     <sql id="baseSql">
+        select 
+            log_id as logId,
+            time as time,
+            user as user,
+            messages as messages,
+            ip as ip
+         from docker_cloud_oper_log 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="search != null">
+            and messages like concat("%",#{search},"%")
+        </if>
+        order by log_id desc
+     </select>
+
+    <select id="selectCounter" resultType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+        select log_id from docker_cloud_oper_log
+    </select>
+
+    <select id="findById" resultType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+                   <include refid="baseSql" />
+            where log_id=#{logId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+        insert into docker_cloud_oper_log(
+            log_id,
+            time,
+            user,
+            messages,
+            ip
+        ) 
+        values(        
+            #{logId},
+            #{time},
+            #{user},
+            #{messages},
+            #{ip}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+        update docker_cloud_oper_log set   
+            log_id=#{logId},
+            time=#{time},
+            user=#{user},
+            messages=#{messages},
+            ip=#{ip}
+         where log_id=#{logId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.log.entity.DockerCloudOperLogEntity">
+        delete from docker_cloud_oper_log where log_id=#{logId}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.ci.dao.DockerCloudImagePullLogDao">
+     <sql id="baseSql">
+        select 
+            pull_id as pullId,
+            image_name as imageName,
+            server_address as serverAddress,
+            pull_time as pullTime,
+            pull_result as pullResult,
+            pull_user as pullUser,
+            env_id as envId,
+            service_name as serviceName,
+            a.ent_id as entId,
+            b.entname as entName
+         from docker_cloud_image_pull_log  a, docker_cloud_ent b where a.ent_id=b.ent_id
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagePullLogEntity">
+         <include refid="baseSql" />
+        <if test="entId != null">
+            and a.ent_id = #{entId}
+        </if>
+        <if test="envTd != null">
+            and a.env_id = #{envId}
+        </if>
+        <if test="user != nu7ll">
+            and pull_user = #{user}
+        </if>
+        order by pull_id desc
+     </select>
+      <select id="findById" resultType="com.cloud.sms.docker.ci.entity.DockerCloudImagePullLogEntity">
+                   <include refid="baseSql" />
+            and  pull_id=#{pullId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagePullLogEntity">
+        insert into docker_cloud_image_pull_log(
+            pull_id,
+            image_name,
+            server_address,
+            pull_time,
+            pull_result,
+            pull_user,
+            env_id,
+            service_name,
+            ent_id,
+            ent_name
+        ) 
+        values(        
+            #{pullId},
+            #{imageName},
+            #{serverAddress},
+            #{pullTime},
+            #{pullResult},
+            #{pullUser},
+            #{envId},
+            #{serviceName},
+            #{entId},
+            #{entName}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagePullLogEntity">
+        update docker_cloud_image_pull_log set   
+            pull_id=#{pullId},
+            image_name=#{imageName},
+            server_address=#{serverAddress},
+            pull_time=#{pullTime},
+            pull_result=#{pullResult},
+            pull_user=#{pullUser},
+            env_id=#{envId},
+            service_name=#{serviceName},
+            ent_id=#{entId},
+            ent_name=#{entName}
+         where pull_id=#{pullId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.ci.entity.DockerCloudImagePullLogEntity">
+        delete from docker_cloud_image_pull_log where pull_id=#{pullId}
+    </delete>
+
+</mapper>
+

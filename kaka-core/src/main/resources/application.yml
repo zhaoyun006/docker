@@ -1,0 +1,4 @@
+cloud:
+                                          tomcat:
+                                            session:
+                                              address: redis://10.16.45.216:6378

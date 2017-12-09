@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloud.sms.docker.server.dao.DockerCloudEntDao">
+     <sql id="baseSql">
+        select 
+            ent_id as entId,
+            create_user as createUser,
+            last_modify_user as lastModifyUser,
+            last_modify_time as lastModifyTime,
+            description as description,
+            create_time as createTime,
+            entname as entname,
+            container_min as containerMin,
+            container_max as containerMax,
+            cpu as cpu,
+            memory as memory,
+            version as version,
+            checked as checked,
+            disabled as disabled,
+            network as network,
+            default_network as defaultNetwork,
+            title as title
+         from docker_cloud_ent 
+     </sql>
+    <select id="selectByAll" resultType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+         <include refid="baseSql" />
+        WHERE 1=1
+        <if test="ids != null">
+            and ent_id in
+            <foreach collection="ids" close=")" open="(" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+     </select>
+      <select id="findById" resultType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+                   <include refid="baseSql" />
+            where ent_id=#{entId}       </select>
+
+    <insert id="save" parameterType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+        insert into docker_cloud_ent(
+            ent_id,
+            create_user,
+            last_modify_user,
+            last_modify_time,
+            description,
+            create_time,
+            entname,
+            container_min,
+            container_max,
+            cpu,
+            memory,
+            version,
+            checked,
+            disabled,
+            title,
+            network,
+            default_network
+        ) 
+        values(        
+            #{entId},
+            #{createUser},
+            #{lastModifyUser},
+            #{lastModifyTime},
+            #{description},
+            #{createTime},
+            #{entname},
+            #{containerMin},
+            #{containerMax},
+            #{cpu},
+            #{memory},
+            #{version},
+            #{checked},
+            #{disabled},
+            #{title},
+            #{defaultNetwork}
+        )
+    </insert>
+    <select id="selectEnvGroups" resultType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+        select
+        ent_id as entId,
+               container_min as containerMin,
+            container_max as containerMax,
+            cpu as cpu,
+            memory as memory,
+        entname as entname,
+        default_network as defaultNetwork
+        from docker_cloud_ent
+    </select>
+    <update id="update" parameterType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+        update docker_cloud_ent set   
+            ent_id=#{entId},
+        <if test="createTime != null">
+            create_time=#{createTime},
+            create_user=#{createUser},
+        </if>
+            last_modify_user=#{lastModifyUser},
+            last_modify_time=#{lastModifyTime},
+            description=#{description},
+            entname=#{entname},
+            container_min=#{containerMin},
+            container_max=#{containerMax},
+            cpu=#{cpu},
+            memory=#{memory},
+            version=#{version},
+            checked=#{checked},
+            disabled=#{disabled},
+            default_network=#{defaultNetwork},
+            title=#{title}
+        where ent_id=#{entId}
+    </update>
+
+    <delete id="delete" parameterType="com.cloud.sms.docker.server.entity.DockerCloudEntEntity">
+        delete from docker_cloud_ent where ent_id=#{entId}
+    </delete>
+
+</mapper>
+

@@ -86,7 +86,7 @@ public class DockerCmd {
 
 
     // 启动容器，新生产一个
-    public static String runContainer = getConf("runContainer", 1,"docker run {0} -d -t -i {1}");
+    public static String runContainer = getConf("runContainer", 1,"docker run {0} -d -t -i {1} 2>&1");
 
     // 修改docker容器的密码
     public static String changePassword = getConf("changePassword", 1,"docker exec -t {0} sed -i 's#root:.*#root:{1}:17094:0:99999:7:::#g' /etc/shadow 2>&1 && echo 0 || echo 1 ");

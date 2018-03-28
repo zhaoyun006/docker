@@ -158,7 +158,9 @@ public class DockerCommandService {
                 }
 
                 String args = " --privileged --memory="+(memory)+"m ";
-                args += "  --cpuset-cpus="+getSecurityCmd(entity.getCpu());
+                if (null != entity.getCpu()){
+                    args += "  --cpuset-cpus="+getSecurityCmd(entity.getCpu());
+                }
                 args += " -h="+getSecurityCmd(entity.getHostname());
                 args += " --name="+getSecurityCmd(entity.getHostname());
                 for (String dns:getSecurityCmd(entity.getNameserver()).split(",")) {

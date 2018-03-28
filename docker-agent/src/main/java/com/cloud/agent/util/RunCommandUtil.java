@@ -31,17 +31,20 @@ public class RunCommandUtil {
     public static String runScript(String command, int tid){
         String result = "";
         String line = "";
+        logger.info("start cmd"+ command);
         try {
             List<String> cmds = new ArrayList<String>();
             cmds.add("sh");
             cmds.add("-c");
             cmds.add(command);
+            logger.info("start cmd"+ cmds);
             ProcessBuilder pb =new ProcessBuilder(cmds);
             Process process = pb.start();
             InputStream is = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             while ((line = br.readLine()) != null) {
+                    logger.info(line);
                 if (Configure.get("debug","agent.conf").equals("true")) {
                     logger.info(line);
                 }
@@ -100,6 +103,7 @@ public class RunCommandUtil {
      * @return
      */
     public static  String getSecurityCmd(String string){
+        if (null == string){ return ""; }
         string = string.replaceAll("&", "");
         string = string.replaceAll("`", "");
         string = string.replaceAll(";", "");
